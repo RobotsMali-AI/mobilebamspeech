@@ -67,11 +67,12 @@ flutter:
   # you will likely need to update this list of assets after creating your assets with the scripts in utils/ folder
   assets:
     - assets/asr/soloni-be-kalan.onnx
-    - assets/asr/stt-bm-quartznet15x5-v2.onnx
-    - assets/slurp/test-soloni-intent-classifier.onnx
-    - assets/slurp/test-soloni-intent-embedding.onnx
-    - assets/slurp/test-soloni-intent-encoder.onnx
-    - assets/slurp/test-soloni-intent-decoder.onnx
+    # - assets/asr/stt-bm-quartznet15x5-v2.onnx
+    - assets/asr/quartznum.onnx
+    - assets/slurp/soloni-ic-slot-fintech-v0-classifier.onnx
+    - assets/slurp/soloni-ic-slot-fintech-v0-embedding.onnx
+    - assets/slurp/soloni-ic-slot-fintech-v0-encoder.onnx
+    - assets/slurp/soloni-ic-slot-fintech-v0-decoder.onnx
     - assets/audio/test-navigate.wav
     - assets/audio/example1.wav
     - assets/audio/example2.wav
