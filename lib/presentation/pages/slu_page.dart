@@ -61,10 +61,10 @@ class _SluPageState extends State<SluPage> {
 
     try {
       // 1. Resolve local filesystem paths for all required ONNX files
-      final String encoderPath = await AssetManager.copyAssetToLocal('assets/slurp/test-soloni-intent-encoder.onnx');
-      final String embeddingPath = await AssetManager.copyAssetToLocal('assets/slurp/test-soloni-intent-embedding.onnx');
-      final String decoderPath = await AssetManager.copyAssetToLocal('assets/slurp/test-soloni-intent-decoder.onnx');
-      final String classifierPath = await AssetManager.copyAssetToLocal('assets/slurp/test-soloni-intent-classifier.onnx');
+      final String encoderPath = await AssetManager.copyAssetToLocal('assets/slurp/soloni-ic-slot-fintech-v0-encoder.onnx');
+      final String embeddingPath = await AssetManager.copyAssetToLocal('assets/slurp/soloni-ic-slot-fintech-v0-embedding.onnx');
+      final String decoderPath = await AssetManager.copyAssetToLocal('assets/slurp/soloni-ic-slot-fintech-v0-decoder.onnx');
+      final String classifierPath = await AssetManager.copyAssetToLocal('assets/slurp/soloni-ic-slot-fintech-v0-classifier.onnx');
 
       // 2. Fetch vocabulary mapping specified for the SLU architecture (Model Type 2)
       final List<String> currentVocabulary = AppVocabularies.modelVocabs[2] ?? [];

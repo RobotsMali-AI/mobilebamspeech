@@ -1,37 +1,81 @@
-# mobilebamspeech
+# Mobile Bam Speech
 
-Deploying ASR, Speech Intent Classification (SIC) and TTS (VITS) on mobile.
+Mobile Bam Speech is a functional Flutter/Android demonstration of running
+RobotsMali speech models locally on an ARM64 phone. It shows how to integrate
+automatic speech recognition (ASR), speech intent and slot understanding (SLU),
+and VITS text-to-speech (TTS). Most deployed models are based on NVIDIA NeMo.
 
-This application is RobotsMali's testbed for the deploying our Bambara speech models on mobile platforms (specifically android here). The repository holds the codes and configurations for deploying our small ASR (CTC), Speech Intent Classification and TTS fine-tunes directly on android device with Flutter and shared object C libraries.
+This repository is an integration testbed, not a production application or an
+optimized inference stack. In particular, VITS synthesis can be slow on mobile
+hardware, and the deployed TTS checkpoint is undertrained. Consult each model's
+Hugging Face page for architecture, training, limitations, and intended-use
+details.
 
-The library for inference our NeMo models was compiled with [NeMoOnnxSharp](https://github.com/diarray-hub/NeMoOnnxSharp) while the deployment of our VITS based TTS systems rely on sherpa-onnx flutter package. Since both our NeMoOnnxSharp library and sherpa-onnx may need and reference different onnxruntime versions, we have renamed `libonnxruntime.so` shared object for our custom library to `libonnxruntime_nemo.so`.
+## Deployed Models
 
-However when the app loads `libNeMoOnnxSharp.so` for the ASR and SLU pages it maps all references to `libonnxruntime.so` to `libonnxruntime_nemo.so`, so in tts_page.dart you must force the loading of the original libonnxruntime.so library installed by sherpa-onnx, make sure you call `ffi.DynamicLibrary.open('libonnxruntime.so')` inside _initializeTtsEngine method.
+- ASR: [`RobotsMali/quartznum-v0`](https://huggingface.co/RobotsMali/quartznum-v0)
+  and [`RobotsMali/soloni-be-kalan-v0`](https://huggingface.co/RobotsMali/soloni-be-kalan-v0)
+- Intent and slot understanding:
+  [`RobotsMali/soloni-ic-slot-fintech-v0`](https://huggingface.co/RobotsMali/soloni-ic-slot-fintech-v0)
+- TTS: [`RobotsMali/bam-vits-fintech`](https://huggingface.co/RobotsMali/bam-vits-fintech)
 
-This repository already contains the above mentioned shared objects. Please, refer to the scripts in [utils folder](./utils) to create your own ONNX exports from our [ASR/SLU/TTS Models](https://hf.co/RobotsMali)
+The exact assets selected by the application are declared in `pubspec.yaml`. However, we do not share the onnx files in this repository, 
+if we wish to run this application, please recreate the required onnx assets with the scripts inside `utils/` folder
 
-## App Config
+## Mobile Inference Architecture
 
-Because all the speech recognition functionalities in this app are accessed through native libs (shared objects), you should make sure your android app supports extracting native libraries by setting the parameters mentioned below in your AndroidManifest.xml file (under the application tag)
+ASR and SLU use shared libraries compiled with
+[NeMoOnnxSharp](https://github.com/diarray-hub/NeMoOnnxSharp). TTS uses the
+Flutter `sherpa_onnx` package. The required ARM64 libraries are included under
+`android/app/src/main/jniLibs/arm64-v8a/`.
 
-```
+NeMoOnnxSharp and sherpa-onnx can require different ONNX Runtime versions. The
+NeMo copy is therefore renamed to `libonnxruntime_nemo.so`, while sherpa-onnx
+loads `libonnxruntime.so`. Keep the explicit
+`ffi.DynamicLibrary.open('libonnxruntime.so')` call in the TTS initialization
+path; changing this loading arrangement can break either inference stack.
+
+## Model Export
+
+The scripts under [`utils/`](utils/) create the ONNX assets used by the app.
+See [`utils/README.md`](utils/README.md) for commands, dependencies, tested
+models, custom wrapper behavior, and compatibility limits. The ASR exporter can
+use NeMo's native `.export()` support. The SLU and Hugging Face VITS models need
+custom export paths that are currently tuned and validated against the
+RobotsMali model families deployed here.
+
+## Android Configuration
+
+The Android application must extract its native libraries. Keep these
+attributes on the `<application>` element in `AndroidManifest.xml`:
+
+```xml
 android:extractNativeLibs="true"
-tools:replace="android:extractNativeLibs">
+tools:replace="android:extractNativeLibs"
 ```
 
-Also, ensure the manifest tag has `xmlns:tools="http://schemas.android.com/tools"`. Lastly, make sure the shared objects are present in [android/app/src/main/jniLibs/arm64-v8a/](./android/app/src/main/jniLibs/arm64-v8a/).
+The manifest root must also declare
+`xmlns:tools="http://schemas.android.com/tools"`. When replacing model or media
+files, declare every shipped asset in `pubspec.yaml`.
 
-Once you have verified your setup and downloaded the onnx models you should make sure they are correctly referenced in [pubspec.yaml](./pubspec.yaml)
+## Run the App
 
-## Run the app
-
-Once you checked the above points you can launch the app with (make sure you use a real android-arm64 device):
+Use a physical Android ARM64 device because the bundled native libraries target
+that ABI:
 
 ```bash
 flutter pub get
 flutter run
 ```
 
-## Notes
+Before contributing, run:
 
-This app is **not** optimized, it is only intented to showcase the simplest way you can deploy [RobotsMali's Bambara Speech Models](https://hf.co/RobotsMali) on android devices with flutter. but since the models are lightweight, one may find inference speed to be decent on most modern android devices. Also the models used for this demo may not be the latest or most performant versions.
+```bash
+dart format lib test
+flutter analyze
+flutter test
+```
+
+Performance and output quality vary by device and checkpoint. Validate exported
+models on target hardware and treat this application as a working integration
+example rather than an optimized deployment baseline.

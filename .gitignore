@@ -46,3 +46,7 @@ app.*.map.json
 
 # Ignore onnx models
 assets/**/*.onnx
+
+# Local Python environment for model export tooling
+.venv/
+venv/

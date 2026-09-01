@@ -2,11 +2,7 @@ class AppVocabularies {
   /// Map associating modelType integers with their respective training vocabularies
   static final Map<int, List<String>> modelVocabs = {
     // modelType = 0: quartznet
-    0: [
-      ' ', "'", '-', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-      'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
-      'z', 'à', 'è', 'é', 'ô', 'ù', 'ŋ', 'ɔ', 'ɛ', 'ɲ'
-    ],
+    0: [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ŋ', 'ɔ', 'ɛ', 'ɲ'],
 
     // modelType = 1: soloni
     1: [
@@ -69,11 +65,8 @@ class AppVocabularies {
     ],
 
     // modelType = 2: SLUModel
-    2 : [
-      '<unk>', '<s>', '</s>', '<pad>', "▁'", "':", 'ti', "',", 'en', 'on',
-      'tion', "{'", "'", '▁', 'e', 't', 'i', 'a', 'n', 'o', ':', 'c', 's',
-      'r', ',', 'p', '{', '}', 'l', 'g', '_', '[', ']', 'f', 'N', 'v', 'O',
-      'y', 'u', 'M', 'm', 'H', 'b', 'P', 'd', 'q', 'A', 'F', 'Q', 'h'
-    ],
+    2 : ['<unk>', '<s>', '</s>', '<pad>', "▁'", 'ti', "':", "',", 'en', 'on', 'tion',
+      'er', "'", '▁', 't', 'e', 'i', 'a', 'n', 'o', ':', 'r', 'c', 's', ',', 'p', '_', '{',
+      '}', '[', ']', 'g', 'l', 'f', 'O', 'u', 'm', 'N', 'v', 'y', 'M', 'H', 'b', 'P', 'd', 'q', 'A', 'F', 'Q', 'h'],
   };
 }

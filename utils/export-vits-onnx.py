@@ -3,36 +3,7 @@ import argparse
 import torch
 import onnx
 from transformers import VitsModel, VitsTokenizer
-
-class SherpaVitsWrapper(torch.nn.Module):
-    def __init__(self, hf_model, is_multi_speaker=False):
-        super().__init__()
-        self.hf_model = hf_model
-        self.is_multi_speaker = is_multi_speaker
-
-    def forward(self, x, x_lengths, noise_scale=0.667, length_scale=1.0, noise_scale_w=0.8, sid=None):
-        """
-        Adapter mapping the external inputs from the sherpa-onnx runtime
-        to the exact Hugging Face VitsModel.forward signature.
-        """
-        forward_kwargs = {
-            "input_ids": x,
-        }
-        
-        if self.is_multi_speaker and sid is not None:
-            forward_kwargs["speaker_id"] = sid
-
-        outputs = self.hf_model(**forward_kwargs)
-        waveform = outputs.waveform
-
-        # Force tracing compiler to keep structural inputs alive
-        dummy_zero = (
-                (noise_scale.sum() * 0.0) +
-                (length_scale.sum() * 0.0) +
-                (noise_scale_w.sum() * 0.0) +
-                (x_lengths.sum() * 0.0)
-        )
-        return waveform + dummy_zero.to(waveform.dtype)
+from wrappers import SherpaVitsWrapper
 
 def export_hf_vits_to_sherpa(model_id: str, output_dir: str):
     # Ensure target path structure exists safely
@@ -86,7 +57,8 @@ def export_hf_vits_to_sherpa(model_id: str, output_dir: str):
         output_names=output_names,
         dynamic_axes=dynamic_axes,
         opset_version=17,
-        do_constant_folding=True
+        do_constant_folding=True,
+        dynamo=False,
     )
 
     print("Injecting runtime metadata fields into ONNX graph headers...")
@@ -132,8 +104,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model-id", "-m",
         type=str,
-        default="diarray/bam-vits",
-        help="The Hugging Face repo path identifier or local checkpoint folder route (Default: diarray/bam-vits)."
+        default="RobotsMali/bam-vits-fintech",
+        help="The Hugging Face repo path identifier or local checkpoint folder route (Default: RobotsMali/bam-vits-fintech)."
     )
     
     parser.add_argument(
