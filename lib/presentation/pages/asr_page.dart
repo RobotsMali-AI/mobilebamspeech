@@ -28,7 +28,7 @@ class _AsrPageState extends State<AsrPage> {
 
   // Configuration maps updated to target correct Type specifications
   final Map<String, int> _models = {
-    'stt-bm-quartznet15x5-v2.onnx': 0,
+    'quartznum.onnx': 0,
     'soloni-be-kalan.onnx': 1,
   };
 
